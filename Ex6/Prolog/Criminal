@@ -1,0 +1,43 @@
+% --- FACTS ---
+american(west).
+enemy(nono, america).
+owns(nono, m1).
+missile(m1).
+
+% --- RULES ---
+
+% A person is a criminal if they are American, possess a weapon,
+% sell it to a nation, and that nation is hostile.
+criminal(X) :-
+    american(X),
+    weapon(Y),
+    sells(X, Y, Z),
+    hostile(Z).
+
+% An enemy of America is considered hostile.
+hostile(X) :-
+    enemy(X, america).
+
+% All missiles are weapons.
+weapon(X) :-
+    missile(X).
+
+% If a person is American and a nation owns a missile,
+% we infer the person sold it to them.
+sells(west, X, nono) :-
+    american(west),
+    missile(X),
+    owns(nono, X).
+OUTPUT:
+12 ?-
+['criminal'].
+true.
+
+14 ?- criminal(west).
+true.
+
+15 ?- criminal(WHO).
+WHO = west.
+
+16 ?- criminal(north).
+false.
