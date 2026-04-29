@@ -1,0 +1,66 @@
+% ==================================================
+% FACTS: Genders
+% ==================================================
+male(john). male(bob). male(tom). male(steve).
+male(fred). male(scott). male(jack). male(rich).
+male(mike). male(harry). male(carol). male(jim).
+
+female(patty). female(mary). female(alice). female(linda).
+female(valerie). female(barbara). female(donna). female(rachel).
+female(jane). female(cindy).
+
+% ==================================================
+% FACTS: Parentage (Based strictly on the image)
+% ==================================================
+father(john, carol).  mother(patty, carol).
+father(john, tom).    mother(mary, tom).
+father(john, linda).  mother(mary, linda).
+father(bob, jim).     mother(mary, jim).
+
+father(tom, valerie). mother(alice, valerie).
+father(tom, barbara). mother(alice, barbara).
+
+father(steve, jack).  mother(linda, jack).
+father(steve, rich).  mother(linda, rich).
+
+father(fred, jane).   mother(valerie, jane).
+father(scott, cindy). mother(barbara, cindy).
+father(jack, mike).   mother(donna, mike).
+father(rich, harry).  mother(rachel, harry).
+
+% ==================================================
+% RULES
+% ==================================================
+parent(X, Y) :- father(X, Y) ; mother(X, Y).
+
+sibling(X, Y) :-
+    father(F, X), father(F, Y),
+    mother(M, X), mother(M, Y),
+    X \= Y.
+
+brother(X, Y) :- sibling(X, Y), male(X).
+sister(X, Y) :- sibling(X, Y), female(X).
+
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+grandfather(X, Y) :- grandparent(X, Y), male(X).
+grandmother(X, Y) :- grandparent(X, Y), female(X).
+
+aunt(X, Y) :- sister(X, P), parent(P, Y).
+uncle(X, Y) :- brother(X, P), parent(P, Y).
+cousin(X, Y) :- parent(P1, X), parent(P2, Y), sibling(P1, P2).
+
+% ==================================================
+% RELATION WRAPPER WITH "NOT RELATED"
+% ==================================================
+is_related(X, Y, brother) :- brother(X, Y).
+is_related(X, Y, sister) :- sister(X, Y).
+is_related(X, Y, father) :- father(X, Y).
+is_related(X, Y, mother) :- mother(X, Y).
+is_related(X, Y, grandfather) :- grandfather(X, Y).
+is_related(X, Y, grandmother) :- grandmother(X, Y).
+is_related(X, Y, uncle) :- uncle(X, Y).
+is_related(X, Y, aunt) :- aunt(X, Y).
+is_related(X, Y, cousin) :- cousin(X, Y).
+
+relation(X, Y, R) :- is_related(X, Y, R).
+relation(X, Y, 'not related') :- \+ is_related(X, Y, _).
